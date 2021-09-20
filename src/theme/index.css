@@ -1,0 +1,31 @@
+@import "./normalize.css";
+
+@font-face {
+  font-family: "Metropolis";
+  font-weight: 400;
+  src: url(./fonts/Metropolis-Regular.woff) format("woff");
+}
+@font-face {
+  font-family: "Metropolis";
+  font-weight: 600;
+  src: url(./fonts/Metropolis-Bold.woff) format("woff");
+}
+
+body {
+  font-family: Metropolis, sans-serif;
+}
+
+p {
+  font-family: Metropolis, sans-serif;
+  font-size: 16px;
+}
+
+h1 {
+  font-family: poppins, sans-serif;
+}
+
+h2,
+h3 {
+  font-family: Metropolis, sans-serif;
+  font-weight: 400;
+}
