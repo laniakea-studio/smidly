@@ -57,7 +57,8 @@ export const InputText: FC<InputProps> = ({
         span {
           font-size: 13px;
           color: tomato;
-          display: inline-flex;
+          display: block;
+          padding: 2px 0;
         }
       }
     `}

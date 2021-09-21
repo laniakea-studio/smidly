@@ -9,15 +9,28 @@ import { getModel } from "../../db/queryData";
 import { AddFieldPanel } from "./_components/AddFieldPanel";
 import { Layout } from "./_Layout";
 import { useProject } from "../../context/ProjectContext";
-import { useParams } from "react-router";
 import { RichTextSettings } from "./_components/FieldSettings/RichTextSettings";
 import { RemoveModel } from "./_components/RemoveModel";
 import { Modal } from "../_components/Modal";
 import { useModal } from "../../hooks/useModal";
-import { Prompt } from "react-router";
+import { Prompt, useParams } from "react-router";
 import { updateModelFields } from "../../db/mutateData";
+import { FieldDropdown } from "./_components/FieldDropdown";
+import { startAfter } from "@firebase/firestore";
+import { isSlug } from "../../utils/inputValidation";
 
 // Todo: Add react-reveal for field items: https://www.react-reveal.com/examples/advanced/todo/
+
+//TODO: This is duplicate
+interface TypeTextField {
+  type: string;
+  fieldId: string;
+  title: string;
+  hint: string;
+  required: boolean;
+  localization: boolean;
+  value?: any;
+}
 
 // Todo: Check types proparly
 type ModelData = {
@@ -41,6 +54,7 @@ export const PageModel: FC<{}> = () => {
   const [data, setData] = useState<any>(null);
   const [unsavedChanges, setUnsavedChanges] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [saveBtn, setSaveBtn] = useState(0);
 
   const { isShown, toggle } = useModal();
 
@@ -59,9 +73,27 @@ export const PageModel: FC<{}> = () => {
     setData({ ...data, fields: [...data.fields, defaultObject] });
   };
 
+  console.log(data);
+
+  const duplicateField = (field: any, index: number) => {
+    const newFeldsArr = [
+      ...data.fields.slice(0, index + 1),
+      field,
+      ...data.fields.slice(index + 1),
+    ];
+
+    setData({ ...data, fields: newFeldsArr });
+  };
+
+  const removeField = (id: string) => {
+    const newFieldsArr = data.fields.filter((i: any) => i.id !== id);
+    setData({ ...data, fields: newFieldsArr });
+  };
+
   useEffect(() => {
     if (!equal(data, initialData)) {
       setUnsavedChanges(true);
+      setSaveBtn(0);
     } else {
       setUnsavedChanges(false);
     }
@@ -84,10 +116,12 @@ export const PageModel: FC<{}> = () => {
   }, [modelId]);
 
   const handleSave = async () => {
+    setSaveBtn(1);
     const result = await updateModelFields(projectId, modelId, data.fields);
     if (result === "success") {
       console.log("Data saved");
-      fetchData();
+      await fetchData();
+      setSaveBtn(3);
     }
   };
 
@@ -114,7 +148,9 @@ export const PageModel: FC<{}> = () => {
                   <h1>{data.modelName}</h1>
                 </div>
                 <Button disabled={!unsavedChanges} onClick={handleSave}>
-                  Save
+                  {saveBtn === 0 && "Save"}
+                  {saveBtn === 1 && <div className="spinner" />}
+                  {saveBtn === 3 && "Changes Saved!"}
                 </Button>
               </header>
 
@@ -133,7 +169,6 @@ export const PageModel: FC<{}> = () => {
                       >
                         <div className="type">
                           <FieldIcon icon={i.type} />
-                          <span>{i.type}</span>
                         </div>
                         <div className="content">
                           <div>
@@ -152,11 +187,12 @@ export const PageModel: FC<{}> = () => {
                         <pre>{i.fieldId}</pre>
                       </div>
                       <div className="editCard">
-                        <button>
-                          <div className="circle">
-                            <SvgDots />
-                          </div>
-                        </button>
+                        <FieldDropdown
+                          duplicateField={duplicateField}
+                          removeField={removeField}
+                          field={i}
+                          index={index}
+                        />
                       </div>
                     </ModelBoardItem>
                   ))}
@@ -229,6 +265,7 @@ const ModelBoardItem = styled.div`
     display: flex;
     align-items: center;
     height: 70px;
+    max-width: 90%;
     background: #fff;
     border: 1px solid #dfe0eb;
     border-radius: 4px;
@@ -268,21 +305,7 @@ const ModelBoardItem = styled.div`
       text-transform: capitalize;
     }
   }
-  button {
-    margin-right: 20px;
-    .circle {
-      height: 22px;
-      width: 22px;
-      border-radius: 11px;
 
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      &:hover {
-        background: #f5f5f5;
-      }
-    }
-  }
   .content {
     flex: 1;
   }
@@ -361,38 +384,6 @@ const SvgDragHandler = () => (
     <path
       d="M1.33333 5.33333V4H14.6667V5.33333H1.33333ZM1.33333 7.33333V8.66667H14.6667V7.33333H1.33333ZM1.33333 10.6667V12H14.6667V10.6667H1.33333Z"
       fill="black"
-    />
-  </svg>
-);
-
-const SvgDots = () => (
-  <svg
-    width="3"
-    height="13"
-    viewBox="0 0 3 13"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <circle
-      cx="1.60716"
-      cy="11.1071"
-      r="1.17857"
-      transform="rotate(-90 1.60716 11.1071)"
-      fill="#525360"
-    />
-    <circle
-      cx="1.60716"
-      cy="6.39296"
-      r="1.17857"
-      transform="rotate(-90 1.60716 6.39296)"
-      fill="#525360"
-    />
-    <circle
-      cx="1.60716"
-      cy="1.67861"
-      r="1.17857"
-      transform="rotate(-90 1.60716 1.67861)"
-      fill="#525360"
     />
   </svg>
 );

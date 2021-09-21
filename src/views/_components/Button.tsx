@@ -35,6 +35,20 @@ export function Button(props: ButtonProps): React.ReactElement<ButtonProps> {
           cursor: default;
           opacity: 0.3;
         }
+        .spinner {
+          border-radius: 50%;
+          width: 24px;
+          height: 24px;
+          border: 2px solid rgba(255, 255, 255, 0.5);
+          border-left-color: #fff;
+          border-top-color: #fff;
+          animation: spin 0.6s infinite linear;
+        }
+        @keyframes spin {
+          to {
+            transform: rotate(359deg);
+          }
+        }
       `}
     >
       {children}

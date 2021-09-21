@@ -5,121 +5,125 @@ import { Button } from "../_components/Button";
 import theme from "../../theme/theme.js";
 import { TextField } from "./_components/Fields/Text";
 import { RichTextField } from "./_components/Fields/RichText";
+import { getModel } from "../../db/queryData";
 import equal from "fast-deep-equal";
-import short from "short-uuid";
 import { Layout } from "./_Layout";
-
-const homeModel = {
-  id: "asdf9823urj92w",
-  pageModelId: "home",
-  name: "Home",
-  note: "",
-  localization: false,
-  slug: "home",
-  icon: "page",
-  fields: [
-    {
-      id: "asdf9823urj9nw",
-      type: "text",
-      fieldId: "title",
-      title: "Title",
-      hint: "Etusivun pääotsikko",
-      required: true,
-      localization: false,
-      value: { default: "Moikku maailma", enEn: "Hello World" },
-    },
-    {
-      id: "asdf9823urj9nn",
-      type: "repeater",
-      fieldId: "features",
-      title: "Features",
-      hint: "",
-      required: true,
-      localization: false,
-      fields: [
-        {
-          type: "text",
-          fieldId: "title",
-          title: "Teksti",
-          hint: "",
-          required: true,
-          localization: false,
-        },
-        {
-          type: "media",
-          fieldId: "icon",
-          title: "Ikoni",
-          hint: "",
-          required: true,
-          localization: false,
-        },
-      ],
-    },
-  ],
-};
+import { Prompt, useParams } from "react-router";
+import { updateModelFields } from "../../db/mutateData";
 
 export const PageContent: FC<{}> = () => {
   const [showSettings, setShowSettings] = useState(1);
-  const [data, setData] = useState(homeModel);
+
+  const [initialData, setInitialData] = useState<any>(null);
+  const [data, setData] = useState<any>(null);
   const [unsavedChanges, setUnsavedChanges] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saveBtn, setSaveBtn] = useState(0);
+
+  const { modelId, projectId }: { modelId: string; projectId: string } =
+    useParams();
 
   const handleFieldChange = (field: any) => {
-    const newFields = data.fields.map((i) =>
+    const newFields = data.fields.map((i: any) =>
       i.id === field.id ? { ...field } : i
     );
 
     setData({ ...data, fields: [...newFields] });
   };
 
-  const addNewField = (defaultObject: any) => {
-    setData({ ...data, fields: [...data.fields, defaultObject] });
-  };
-
   useEffect(() => {
-    if (!equal(data, homeModel)) {
+    if (!equal(data, initialData)) {
       setUnsavedChanges(true);
+      setSaveBtn(0);
     } else {
       setUnsavedChanges(false);
     }
-    console.log("Data", data);
-  }, [data]);
+  }, [data, initialData]);
+
+  async function fetchData() {
+    const data = await getModel(projectId, modelId);
+
+    try {
+      setData(data);
+      setInitialData(data);
+      setLoading(false);
+    } catch {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    fetchData();
+  }, [modelId]);
+
+  const handleSave = async () => {
+    setSaveBtn(1);
+    const result = await updateModelFields(projectId, modelId, data.fields);
+    if (result === "success") {
+      console.log("Data saved");
+      await fetchData();
+      setSaveBtn(3);
+    }
+  };
 
   return (
-    <Layout>
-      <View>
-        <Main>
-          <header className="header">
-            <Icon icon={homeModel.icon} />
-            <h1>Home</h1>
-            <Button disabled={!unsavedChanges}>Save</Button>
-          </header>
-          <div className="modelBoard">
-            {data.fields.map((i, index) => (
-              <FieldItem key={i.id}>
-                {i.type === "text" && (
-                  <TextField data={i} setField={handleFieldChange} />
-                )}
-                {i.type === "richText" && (
-                  <RichTextField data={i} setField={handleFieldChange} />
-                )}
-              </FieldItem>
-            ))}
-          </div>
-        </Main>
-        <Aside>
-          <header>
-            <Icon icon={homeModel.icon} />
-            <h3>Page Settings</h3>
-          </header>
-          <div className="fields"></div>
-        </Aside>
-      </View>
-    </Layout>
+    <>
+      <Prompt
+        when={unsavedChanges}
+        message="You have unsaved changes, are you sure you want to leave?"
+      />
+      <Layout>
+        {loading && <p>Loading...</p>}
+        {!loading && (
+          <View>
+            <Main>
+              <header className="header">
+                <div>
+                  <span>Page</span>
+                  <br />
+                  <h1>{data.modelName}</h1>
+                </div>
+                <Button disabled={!unsavedChanges} onClick={handleSave}>
+                  {saveBtn === 0 && "Save"}
+                  {saveBtn === 1 && <div className="spinner" />}
+                  {saveBtn === 3 && "Changes Saved!"}
+                </Button>
+              </header>
+              <div className="modelBoard">
+                {data.fields.map((i: any, index: any) => (
+                  <FieldItem key={i.id}>
+                    {i.type === "text" && (
+                      <TextField data={i} setField={handleFieldChange} />
+                    )}
+                    {i.type === "richText" && (
+                      <RichTextField data={i} setField={handleFieldChange} />
+                    )}
+                  </FieldItem>
+                ))}
+              </div>
+            </Main>
+            <Aside>
+              <header>
+                <Icon icon={data.icon} />
+                <h3>Page Settings</h3>
+              </header>
+              <div className="fields"></div>
+            </Aside>
+          </View>
+        )}
+      </Layout>
+    </>
   );
 };
 
 const Aside = styled.aside`
   min-width: 360px;
+  @media (max-width: 1300px) {
+    min-width: 320px;
+  }
+  @media (max-width: 1200px) {
+    min-width: 280px;
+  }
   background: #fff;
   display: flex;
   flex-direction: column;
@@ -169,21 +173,25 @@ const Main = styled.main`
     margin-bottom: 140px;
     display: flex;
     align-items: center;
-    svg {
-      width: 24px;
-      path {
-        fill: #000;
-      }
-    }
-    h1 {
-      padding-left: 10px;
-      font-family: Metropolis;
-      font-weight: 400;
-      display: inline;
+    span {
+      color: #888888;
+      letter-spacing: 1px;
+      font-size: 12px;
+      font-weight: 500;
+      text-transform: uppercase;
+      display: inline-block;
+      margin-bottom: 4px;
     }
     button {
       margin-left: auto;
     }
+  }
+  h1 {
+    margin-top: 6px;
+    font-family: Metropolis;
+    font-weight: 400;
+    display: inline;
+    font-size: 32px;
   }
 `;
 

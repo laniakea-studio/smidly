@@ -1,7 +1,26 @@
-import * as React from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import styled from "styled-components";
 import { InputText } from "../../../_components/Inputs";
 import theme from "../../../../theme/theme.js";
+import isHotkey from "is-hotkey";
+import { Editable, withReact, useSlate, Slate } from "slate-react";
+import {
+  Editor,
+  Transforms,
+  createEditor,
+  Descendant,
+  Element as SlateElement,
+} from "slate";
+import { withHistory } from "slate-history";
+
+const HOTKEYS = {
+  "mod+b": "bold",
+  "mod+i": "italic",
+  "mod+u": "underline",
+  "mod+`": "code",
+};
+
+const LIST_TYPES = ["numbered-list", "bulleted-list"];
 
 interface TypeRichTextField {
   type: string;
@@ -22,46 +41,13 @@ export const RichTextField: React.FC<TextSettingsProps> = ({
   data,
   setField,
 }) => {
-  const [fieldCheck, setFieldCheck] = React.useState({
-    hasTitleValue: true,
-    hasFieldIdValue: true,
-    isFieldIdUnique: true,
-  });
-
-  const handleChange = (e: React.FormEvent<HTMLInputElement>) => {
-    let key = e.currentTarget.name;
-    let value = e.currentTarget.value;
-
-    setField({ ...data, [key]: value });
-  };
-
-  React.useEffect(() => {
-    setFieldCheck(checkIfValid());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data]);
-
-  const checkIfValid = () => {
-    const object = {
-      hasTitleValue: data.title.length > 0 ? true : false,
-      hasFieldIdValue: data.fieldId.length > 0 ? true : false,
-      isFieldIdUnique: true,
-    };
-
-    console.log(object);
-    return object;
-  };
-
   return (
     <Div>
-      <form>
-        <InputText
-          className={fieldCheck.hasTitleValue ? undefined : "warning"}
-          name="value"
-          label={`${data.title}${data.required && "*"}`}
-          value={data.value.default}
-          onChange={(e) => handleChange(e)}
-        />
-      </form>
+      <InputText
+        name="value"
+        label={`${data.title}${data.required && "*"}`}
+        value={data.value.default}
+      />
     </Div>
   );
 };

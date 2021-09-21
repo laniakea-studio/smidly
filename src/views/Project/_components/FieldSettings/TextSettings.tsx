@@ -36,8 +36,6 @@ export const TextSettings: React.FC<TextSettingsProps> = ({
     fieldId: [hasMinCharacters(data.fieldId, 3), isSlug(data.fieldId)],
   };
 
-  console.log(validation);
-
   const handleChange = (e: React.FormEvent<HTMLInputElement>) => {
     let key = e.currentTarget.name;
     let value = e.currentTarget.value;
@@ -99,7 +97,6 @@ export const TextSettings: React.FC<TextSettingsProps> = ({
           onBlur={(e) => showMessageOnBlur(e)}
           warning={showWarning("fieldId")}
         />
-
         <InputText
           name="hint"
           label="Hint"

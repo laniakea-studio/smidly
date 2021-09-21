@@ -55,7 +55,7 @@ export const TextField: React.FC<TextSettingsProps> = ({ data, setField }) => {
       <InputText
         className={fieldCheck.hasTitleValue ? undefined : "warning"}
         name="default"
-        label={`${data.title}${data.required && "*"}`}
+        label={`${data.title}${data.required ? "*" : ""}`}
         value={data.value.default}
         onChange={(e) => handleChange(e)}
         hint={data.hint}
@@ -67,6 +67,8 @@ export const TextField: React.FC<TextSettingsProps> = ({ data, setField }) => {
 const Div = styled.div`
   padding: 20px 0;
   position: relative;
+  display: flex;
+  flex-direction: column;
   .warning label {
     color: #f55c5c;
   }
@@ -74,6 +76,6 @@ const Div = styled.div`
     border: 1px solid #f55c5c;
   }
   .fieldId {
-    float: right;
+    align-self: flex-end;
   }
 `;

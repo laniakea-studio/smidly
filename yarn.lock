@@ -7237,6 +7237,11 @@
   "resolved" "https://registry.npmjs.org/is-hotkey/-/is-hotkey-0.1.8.tgz"
   "version" "0.1.8"
 
+"is-hotkey@^0.2.0":
+  "integrity" "sha512-UknnZK4RakDmTgz4PI1wIph5yxSs/mvChWs9ifnlXsKuXgWmOkY/hAE0H/k2MIqH0RlRye0i1oC07MCRSD28Mw=="
+  "resolved" "https://registry.npmjs.org/is-hotkey/-/is-hotkey-0.2.0.tgz"
+  "version" "0.2.0"
+
 "is-module@^1.0.0":
   "integrity" "sha1-Mlj7afeMFNW4FdZkM2tM/7ZEFZE="
   "resolved" "https://registry.npmjs.org/is-module/-/is-module-1.0.0.tgz"
