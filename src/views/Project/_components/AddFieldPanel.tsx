@@ -31,7 +31,7 @@ const defaultFieldSettings = [
       required: false,
       localization: false,
       toolbar: ["h1", "h2", "h3"],
-      value: { default: "" },
+      value: { default: `<p>Well helloo...</p>` },
     },
   },
   {

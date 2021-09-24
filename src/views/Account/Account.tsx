@@ -11,7 +11,7 @@ import {
 } from "../../db/queryData";
 import { Button } from "../_components/Button";
 import { AccountLayout } from "./Layout";
-import { RichTextEditor } from "../_components/RichTextEditor";
+import { RichTextEditor } from "../_components/slate/RichTextEditor";
 import { useModal } from "../../hooks/useModal";
 import { CreateProject } from "./_components/CreateProject";
 import { Modal } from "../_components/Modal";

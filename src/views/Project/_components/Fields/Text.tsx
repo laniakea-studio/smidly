@@ -30,7 +30,6 @@ export const TextField: React.FC<TextSettingsProps> = ({ data, setField }) => {
     let value = e.currentTarget.value;
 
     setField({ ...data, value: { [key]: value } });
-    console.log(data);
   };
 
   React.useEffect(() => {
@@ -45,7 +44,6 @@ export const TextField: React.FC<TextSettingsProps> = ({ data, setField }) => {
       isFieldIdUnique: true,
     };
 
-    console.log(object);
     return object;
   };
 

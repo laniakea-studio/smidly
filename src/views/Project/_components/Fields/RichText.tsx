@@ -12,15 +12,11 @@ import {
   Element as SlateElement,
 } from "slate";
 import { withHistory } from "slate-history";
-
-const HOTKEYS = {
-  "mod+b": "bold",
-  "mod+i": "italic",
-  "mod+u": "underline",
-  "mod+`": "code",
-};
-
-const LIST_TYPES = ["numbered-list", "bulleted-list"];
+import { RichTextEditor } from "../../../_components/slate/RichTextEditor.jsx";
+import {
+  serialize,
+  deserialize,
+} from "../../../_components/slate/htmlSerializing";
 
 interface TypeRichTextField {
   type: string;
@@ -41,13 +37,30 @@ export const RichTextField: React.FC<TextSettingsProps> = ({
   data,
   setField,
 }) => {
+  console.log("input: ", data.value.default);
+
+  const valueDoc = new DOMParser().parseFromString(
+    data.value.default,
+    "text/html"
+  );
+
+  console.log("domparser: ", valueDoc.body);
+
+  const [value, setValue] = useState(deserialize(valueDoc.body));
+
+  console.log("value: ", value);
+
+  const handleChange = (newValue: any) => {
+    setValue(newValue);
+
+    const htmlValue = value.map((i: any) => serialize(i)).join("");
+
+    setField({ ...data, value: { default: htmlValue } });
+  };
+
   return (
     <Div>
-      <InputText
-        name="value"
-        label={`${data.title}${data.required && "*"}`}
-        value={data.value.default}
-      />
+      <RichTextEditor value={value} onChange={handleChange} />
     </Div>
   );
 };
