@@ -7,10 +7,14 @@ import { Button } from "../../_components/Button";
 import { RemoveProject } from "./RemoveProject";
 import { Modal } from "../../_components/Modal";
 import { useModal } from "../../../hooks/useModal";
+import { useProject } from "../../../context/ProjectContext";
+
+// TODO: Add Collaborators
 
 export const SiteSettings: FC<{}> = () => {
   const { isShown, toggle } = useModal();
 
+  const { currentProject } = useProject();
   return (
     <>
       <Modal
@@ -32,6 +36,10 @@ export const SiteSettings: FC<{}> = () => {
               >
                 Delete Project
               </Button>
+            </div>
+            <div className="collaborators">
+              <h2>Collaborators</h2>
+              <Button onClick={toggle}>Add Collaborator</Button>
             </div>
           </Main>
         </View>
@@ -72,9 +80,12 @@ const Main = styled.main`
       margin-left: auto;
     }
   }
+  h2 {
+    margin-bottom: 30px;
+  }
   .dangerZone {
-    h2 {
-      margin-bottom: 40px;
-    }
+  }
+  .collaborators {
+    margin-top: 70px;
   }
 `;

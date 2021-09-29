@@ -1,4 +1,4 @@
-import { Children, FC, InputHTMLAttributes } from "react";
+import { Children, FC, InputHTMLAttributes, useEffect, useState } from "react";
 import { css } from "styled-components/macro";
 import theme from "../../theme/theme.js";
 import styled from "styled-components";
@@ -8,8 +8,19 @@ import { async } from "@firebase/util";
 import { UserDropdown } from "./_components/UserDropdown";
 
 export const AccountLayout: FC<{}> = ({ children }) => {
-  const { currentUser, logout } = useAuth();
+  const { currentUser, logout, getUser } = useAuth();
   const history = useHistory();
+
+  const [userData, setUserData] = useState({ name: "", company: "" });
+
+  async function fetchUser() {
+    const data = await getUser(currentUser.uid);
+    setUserData(data);
+  }
+
+  useEffect(() => {
+    fetchUser();
+  }, []);
 
   return (
     <View>
@@ -25,7 +36,7 @@ export const AccountLayout: FC<{}> = ({ children }) => {
             <NavLink to="/account/profile">My Profile</NavLink>
           </div>
           <div className="right">
-            <UserDropdown />
+            <UserDropdown userData={userData} />
           </div>
         </Header>
       </div>

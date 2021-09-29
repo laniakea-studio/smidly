@@ -4,6 +4,7 @@ import { Button } from "../_components/Button";
 import { InputText } from "../_components/Inputs";
 import { useAuth } from "../../context/AuthContext";
 import { PublicLayout } from "./Layout";
+import { useHistory } from "react-router-dom";
 
 export const SignUp: FC<{}> = () => {
   const [form, setForm] = useState({
@@ -17,6 +18,7 @@ export const SignUp: FC<{}> = () => {
   const [loading, setLoading] = useState(false);
 
   const { signup } = useAuth();
+  const history = useHistory();
 
   const handleChange = (e: React.FormEvent<HTMLInputElement>) => {
     let key = e.currentTarget.name;
@@ -29,10 +31,15 @@ export const SignUp: FC<{}> = () => {
     if (form.password !== form.password2) {
       return setMessage("Passwords do not match");
     }
+    const optionalData = {
+      name: form.name,
+      company: form.company,
+    };
     try {
       setMessage("");
       setLoading(true);
-      await signup(form.email, form.password);
+      await signup(form.email, form.password, optionalData);
+      history.push("/account/projects");
     } catch {
       setMessage("Failed to create account");
     }

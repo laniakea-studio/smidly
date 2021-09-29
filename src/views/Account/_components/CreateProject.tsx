@@ -7,6 +7,7 @@ import { InputText } from "../../_components/Inputs";
 // @ts-ignore
 import Fade from "react-reveal/Fade";
 import { addProject } from "../../../db/mutateData";
+import { useAuth } from "../../../context/AuthContext";
 
 interface CreateProjectProps {
   closeModal: () => void;
@@ -17,10 +18,13 @@ export const CreateProject: FC<CreateProjectProps> = ({
   closeModal,
   onSucces,
 }) => {
+  const { currentUser } = useAuth();
+
   const [data, setData] = useState({
-    owner_id: "",
-    admins_id: [],
+    owner_id: currentUser.uid,
+    admins_id: [currentUser.uid],
     editors_id: [],
+    users: [currentUser.uid],
     models: [],
     projectName: "",
     projectSlug: "",

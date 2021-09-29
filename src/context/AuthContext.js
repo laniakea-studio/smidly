@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { auth } from "../firebase";
+import { auth, fireStore } from "../firebase";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -8,6 +8,7 @@ import {
   updateEmail,
   updatePassword,
 } from "firebase/auth";
+import { collection, doc, setDoc, getDoc } from "firebase/firestore";
 
 const AuthContext = React.createContext();
 
@@ -19,8 +20,11 @@ export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState();
   const [loading, setLoading] = useState(true);
 
-  function signup(email, password) {
-    return createUserWithEmailAndPassword(auth, email, password);
+  function signup(email, password, optionalData) {
+    createUserWithEmailAndPassword(auth, email, password).then((res) => {
+      setDoc(doc(fireStore, "users", res.user.uid), optionalData);
+      console.log("Document written with ID: ", res.user.uid);
+    });
   }
 
   function login(email, password) {
@@ -42,6 +46,17 @@ export function AuthProvider({ children }) {
     return updatePassword(auth.currentUser, password);
   }
 
+  const getUser = async (userId) => {
+    const docRef = doc(fireStore, "users", userId);
+    const docSnap = await getDoc(docRef);
+
+    try {
+      return docSnap.data();
+    } catch {
+      console.log("Failed to load user");
+    }
+  };
+
   useEffect(() => {
     const unsubscribed = auth.onAuthStateChanged((user) => {
       setCurrentUser(user);
@@ -58,6 +73,7 @@ export function AuthProvider({ children }) {
     resetPassword,
     updateProfileEmail,
     updateProfilePassword,
+    getUser,
   };
   return (
     <AuthContext.Provider value={value}>

@@ -4,7 +4,16 @@ import { useAuth } from "../../../context/AuthContext";
 import useComponentVisible from "../../../hooks/useComponentVisible";
 import { Link, useHistory } from "react-router-dom";
 
-export const UserDropdown: FC<{}> = () => {
+interface TypeUserData {
+  name: string;
+  company: string;
+}
+
+interface UserDropdownProps {
+  userData: TypeUserData;
+}
+
+export const UserDropdown: FC<UserDropdownProps> = ({ userData }) => {
   const {
     ref: dropdown,
     isComponentVisible: showDropOne,
@@ -29,26 +38,17 @@ export const UserDropdown: FC<{}> = () => {
   return (
     <Dropdown>
       <button onClick={() => setShowDropOne(true)}>
-        <svg
-          width="40"
-          height="40"
-          viewBox="0 0 39 39"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M38.1918 19.5C38.1918 29.9934 29.6852 38.5 19.1918 38.5C8.69836 38.5 0.191774 29.9934 0.191774 19.5C0.191774 9.00659 8.69836 0.5 19.1918 0.5C29.6852 0.5 38.1918 9.00659 38.1918 19.5Z"
-            fill="#236D85"
-          />
-          <path
-            d="M23.7759 28H25.5519L19.4559 11.44H17.5599L11.4399 28H13.2159L14.6799 24.016H22.3119L23.7759 28ZM21.8079 22.624H15.1839L18.4959 13.552L21.8079 22.624Z"
-            fill="white"
-          />
-        </svg>
+        <div className="ball">
+          <span>{userData?.name?.charAt(0).toUpperCase()}</span>
+        </div>
       </button>
       {showDropOne && (
         <div className="dropdownBox" ref={dropdown}>
-          <p>{currentUser.email}</p>
+          <div className="content">
+            <p className="name">{userData?.name}</p>
+            <p className="email">{currentUser.email}</p>
+            <p className="company">{userData?.company}</p>
+          </div>
           <button onClick={(e) => handleLogout(e)}>Log out</button>
         </div>
       )}
@@ -64,25 +64,57 @@ const Dropdown = styled.div`
     height: 40px;
     border-radius: 50%;
     margin: 0;
+    .ball {
+      width: 40px;
+      height: 40px;
+      background: #236d85;
+      border-radius: 50%;
+      color: #ffffff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 22px;
+      font-weight: 400;
+    }
   }
-
+  .content {
+    padding: 20px;
+  }
+  .name {
+    font-size: 18px;
+    font-weight: 500;
+  }
+  .company {
+    margin-top: 0;
+  }
+  .email {
+    margin-top: 0;
+    margin-bottom: 6px;
+    color: #787878;
+    font-size: 14px;
+  }
   .dropdownBox {
     top: 42px;
     right: 0;
-    padding: 20px;
+
     background: #ffffff;
     box-shadow: 0px 4px 6px 6px rgba(231, 231, 231, 0.25);
     border-radius: 3px;
     letter-spacing: 0.03em;
-    font-family: poppins;
-    font-size: 13px;
-
     position: absolute;
+    min-width: 220px;
     button {
+      padding: 20px;
       width: 100%;
+      border-radius: 0;
       text-align: right;
-      padding: 0;
       text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      justify-content: flex-end;
+      &:hover {
+        background: #f8f8f8;
+      }
     }
   }
 `;

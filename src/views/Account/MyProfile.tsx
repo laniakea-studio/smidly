@@ -1,4 +1,4 @@
-import React, { FC, useState } from "react";
+import React, { FC, useEffect, useState } from "react";
 import styled from "styled-components";
 import { useAuth } from "../../context/AuthContext";
 import { InputText } from "../_components/Inputs";
@@ -6,7 +6,8 @@ import { Button } from "../_components/Button";
 import { AccountLayout } from "./Layout";
 
 export const MyProfile: FC<{}> = () => {
-  const { currentUser, updateProfileEmail, updateProfilePassword } = useAuth();
+  const { currentUser, updateProfileEmail, updateProfilePassword, getUser } =
+    useAuth();
 
   const [form, setForm] = useState({
     name: "",
@@ -16,6 +17,16 @@ export const MyProfile: FC<{}> = () => {
   });
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const fetchUser = async () => {
+    const data = await getUser(currentUser.uid);
+    console.log(data);
+    setForm({ ...form, name: data?.name, company: data?.company });
+  };
+
+  useEffect(() => {
+    fetchUser();
+  }, []);
 
   const handleChange = (e: React.FormEvent<HTMLInputElement>) => {
     let key = e.currentTarget.name;
@@ -55,7 +66,12 @@ export const MyProfile: FC<{}> = () => {
         <h1>Update Profile</h1>
 
         <Form onSubmit={(e) => handleSubmit(e)}>
-          <InputText name="name" label="Name" onChange={handleChange} />
+          <InputText
+            name="name"
+            label="Name"
+            onChange={handleChange}
+            value={form.name}
+          />
           <InputText
             type="email"
             name="email"
@@ -64,7 +80,12 @@ export const MyProfile: FC<{}> = () => {
             onChange={handleChange}
             value={form.email}
           />
-          <InputText name="company" label="Company" onChange={handleChange} />
+          <InputText
+            name="company"
+            label="Company"
+            onChange={handleChange}
+            value={form.company}
+          />
           <InputText
             type="password"
             name="password"

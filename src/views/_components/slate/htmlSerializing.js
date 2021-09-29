@@ -15,7 +15,7 @@ import { ReactEditor, Slate, Editable, withReact } from "slate-react";
 import { HistoryEditor } from "slate-history";
 
 export const serialize = (node) => {
-  if (Text.isText(node)) {
+  if (Text.isText(node.nodeType)) {
     let string = escapeHtml(node.text);
     if (node.bold) {
       string = `<strong>${string}</strong>`;
@@ -38,6 +38,7 @@ export const serialize = (node) => {
 };
 
 export const deserialize = (el) => {
+  console.log("des:", el);
   if (el.nodeType === 3) {
     return el.textContent;
   } else if (el.nodeType !== 1) {
@@ -65,7 +66,9 @@ export const deserialize = (el) => {
         { type: "link", url: el.getAttribute("href") },
         children
       );
-    case "STRONG":
+    case "strong":
+      return jsx("element", { type: "bold", bold: true }, children);
+    case "EM":
       return jsx("element", { type: "bold" }, children);
     default:
       return el.textContent;

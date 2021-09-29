@@ -11,7 +11,6 @@ import {
 } from "../../db/queryData";
 import { Button } from "../_components/Button";
 import { AccountLayout } from "./Layout";
-import { RichTextEditor } from "../_components/slate/RichTextEditor";
 import { useModal } from "../../hooks/useModal";
 import { CreateProject } from "./_components/CreateProject";
 import { Modal } from "../_components/Modal";
@@ -39,9 +38,10 @@ export const Account: FC<{}> = () => {
     undefined
   );
   const { isShown, toggle } = useModal();
+  const { currentUser } = useAuth();
 
   async function fetchData() {
-    const data = await getProjects();
+    const data = await getProjects(currentUser.uid);
     setProjectsData(data);
   }
 
@@ -110,7 +110,6 @@ export const Account: FC<{}> = () => {
 
 const ProjectItem = styled.div`
   width: 100%;
-  min-height: 160px;
   border: 1px solid #e7e7e7;
   border-radius: 4px;
   transition: all 0.2s;
@@ -121,7 +120,7 @@ const ProjectItem = styled.div`
   > a {
     display: flex;
     height: 100%;
-
+    padding: 20px 0;
     p {
       font-size: 14px;
       color: #979797;
@@ -129,7 +128,6 @@ const ProjectItem = styled.div`
   }
   .imgBox {
     flex-basis: 200px;
-    height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;

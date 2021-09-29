@@ -11,16 +11,18 @@ import { fireStore } from "../firebase";
 //Set an object field: https://stackoverflow.com/questions/48537427/firestore-insert-object-field
 // Update field in obj: https://stackoverflow.com/questions/48046672/update-a-field-in-an-object-in-firestore/48615398
 
-export const getProjects = async () => {
-  const query = await getDocs(collection(fireStore, "/projects"));
+export const getProjects = async (userId) => {
+  const projectsRef = collection(fireStore, "/projects");
 
+  const q = query(projectsRef, where("users", "array-contains", userId));
+
+  const querySnapshot = await getDocs(q);
   let projects = [];
 
-  query.forEach((doc, i) => {
+  querySnapshot.forEach((doc, i) => {
     projects.push({ ...doc.data(), _id: doc.id });
   });
 
-  console.log(projects);
   return projects;
 };
 
