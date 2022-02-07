@@ -7,6 +7,7 @@ import { NavLink, useHistory } from "react-router-dom";
 import { async } from "@firebase/util";
 import { UserDropdown } from "./_components/UserDropdown";
 
+// TODO Use memo(?) to not fetch user data on every page change
 export const AccountLayout: FC<{}> = ({ children }) => {
   const { currentUser, logout, getUser } = useAuth();
   const history = useHistory();

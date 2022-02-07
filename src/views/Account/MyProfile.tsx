@@ -4,6 +4,7 @@ import { useAuth } from "../../context/AuthContext";
 import { InputText } from "../_components/Inputs";
 import { Button } from "../_components/Button";
 import { AccountLayout } from "./Layout";
+import { ProfilePicture } from "./_components/ProfilePicture";
 
 export const MyProfile: FC<{}> = () => {
   const { currentUser, updateProfileEmail, updateProfilePassword, getUser } =
@@ -64,7 +65,7 @@ export const MyProfile: FC<{}> = () => {
     <AccountLayout>
       <Main>
         <h1>Update Profile</h1>
-
+        <ProfilePicture />
         <Form onSubmit={(e) => handleSubmit(e)}>
           <InputText
             name="name"
